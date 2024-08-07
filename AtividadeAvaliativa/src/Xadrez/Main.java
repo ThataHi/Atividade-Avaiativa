@@ -19,10 +19,12 @@ class Rei extends Peca {
     @Override
     public boolean mover(int novoX, int novoY) {
         if (Math.abs(novoX - x) <= 1 && Math.abs(novoY - y) <= 1) {
+            System.out.println("Movimento válido para o Rei.");
             x = novoX;
             y = novoY;
             return true;
         }
+        System.out.println("Movimento inválido para o Rei.");
         return false;
     }
 }
@@ -35,15 +37,17 @@ class Rainha extends Peca {
     @Override
     public boolean mover(int novoX, int novoY) {
         if (novoX == x || novoY == y || Math.abs(novoX - x) == Math.abs(novoY - y)) {
+            System.out.println("Movimento válido para a Rainha.");
             x = novoX;
             y = novoY;
             return true;
         }
+        System.out.println("Movimento inválido para a Rainha.");
         return false;
     }
 }
 
-// Definir outras peças semelhantes (Bispo, Cavalo, Torre, Peão) aqui
+//Definir outras peças semelhantes (Bispo, Cavalo, Torre, Peão) aqui
 class Bispo extends Peca {
     public Bispo(int x, int y) {
         super(x, y);
@@ -52,13 +56,16 @@ class Bispo extends Peca {
     @Override
     public boolean mover(int novoX, int novoY) {
         if (Math.abs(novoX - x) == Math.abs(novoY - y)) {
+            System.out.println("Movimento válido para o Bispo.");
             x = novoX;
             y = novoY;
             return true;
         }
+        System.out.println("Movimento inválido para o Bispo.");
         return false;
     }
 }
+
 class Cavalo extends Peca {
     public Cavalo(int x, int y) {
         super(x, y);
@@ -68,10 +75,12 @@ class Cavalo extends Peca {
     public boolean mover(int novoX, int novoY) {
         if ((Math.abs(novoX - x) == 2 && Math.abs(novoY - y) == 1) ||
             (Math.abs(novoX - x) == 1 && Math.abs(novoY - y) == 2)) {
+            System.out.println("Movimento válido para o Cavalo.");
             x = novoX;
             y = novoY;
             return true;
         }
+        System.out.println("Movimento inválido para o Cavalo.");
         return false;
     }
 }
@@ -84,10 +93,12 @@ class Torre extends Peca {
     @Override
     public boolean mover(int novoX, int novoY) {
         if (novoX == x || novoY == y) {
+            System.out.println("Movimento válido para a Torre.");
             x = novoX;
             y = novoY;
             return true;
         }
+        System.out.println("Movimento inválido para a Torre.");
         return false;
     }
 }
@@ -99,13 +110,15 @@ class Peao extends Peca {
 
     @Override
     public boolean mover(int novoX, int novoY) {
-        // Considerando que os peões só se movem para frente e capturam na diagonal
+        //Considerando que os peões só se movem para frente e capturam na diagonal
         if ((novoX == x && novoY == y + 1) || // Movimento simples
             (Math.abs(novoX - x) == 1 && novoY == y + 1)) { // Captura
+            System.out.println("Movimento válido para o Peão.");
             x = novoX;
             y = novoY;
             return true;
         }
+        System.out.println("Movimento inválido para o Peão.");
         return false;
     }
 }
@@ -132,16 +145,45 @@ class Tabuleiro {
     }
 }
 
+class Jogador {
+    private String nome;
+
+    public Jogador(String nome) {
+        this.nome = nome;
+    }
+
+    public boolean fazerMovimento(Tabuleiro tabuleiro, int x, int y, int novoX, int novoY) {
+        if (tabuleiro.moverPeca(x, y, novoX, novoY)) {
+            System.out.println(nome + " fez um movimento válido.");
+            return true;
+        } else {
+            System.out.println(nome + " fez um movimento inválido.");
+            return false;
+        }
+    }
+}
+
 public class Main {
     public static void main(String[] args) {
         Tabuleiro tabuleiro = new Tabuleiro();
         Peca rei = new Rei(0, 0);
         Peca rainha = new Rainha(1, 1);
+        Peca bispo = new Bispo(2, 2);
+        Peca cavalo = new Cavalo(3, 3);
+        Peca torre = new Torre(4, 4);
+        Peca peao = new Peao(5, 5);
 
         tabuleiro.adicionarPeca(rei, 0, 0);
         tabuleiro.adicionarPeca(rainha, 1, 1);
+        tabuleiro.adicionarPeca(bispo, 2, 2);
+        tabuleiro.adicionarPeca(cavalo, 3, 3);
+        tabuleiro.adicionarPeca(torre, 4, 4);
+        tabuleiro.adicionarPeca(peao, 5, 5);
 
-        tabuleiro.moverPeca(0, 0, 1, 1); // Movimento inválido para o Rei
-        tabuleiro.moverPeca(1, 1, 3, 3); // Movimento válido para a Rainha
+        Jogador jogador1 = new Jogador("Jogador 1");
+        Jogador jogador2 = new Jogador("Jogador 2");
+
+        System.out.println(jogador1.fazerMovimento(tabuleiro, 0, 0, 1, 1)); // Movimento inválido para o Rei
+        System.out.println(jogador1.fazerMovimento(tabuleiro, 1, 1, 3, 3)); // Movimento válido para a Rainha
     }
 }
