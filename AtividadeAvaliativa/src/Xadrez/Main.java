@@ -8,7 +8,7 @@ abstract class Peca {
         this.y = y;
     }
 
-    public abstract boolean mover(int novoX, int novoY);
+    public abstract boolean mover(int novoX, int novoY, Tabuleiro tabuleiro);
 }
 
 class Rei extends Peca {
@@ -17,12 +17,14 @@ class Rei extends Peca {
     }
 
     @Override
-    public boolean mover(int novoX, int novoY) {
+    public boolean mover(int novoX, int novoY, Tabuleiro tabuleiro) {
         if (Math.abs(novoX - x) <= 1 && Math.abs(novoY - y) <= 1) {
-            System.out.println("Movimento válido para o Rei.");
-            x = novoX;
-            y = novoY;
-            return true;
+            if (tabuleiro.isPosicaoValida(novoX, novoY)) {
+                System.out.println("Movimento válido para o Rei.");
+                x = novoX;
+                y = novoY;
+                return true;
+            }
         }
         System.out.println("Movimento inválido para o Rei.");
         return false;
@@ -35,12 +37,25 @@ class Rainha extends Peca {
     }
 
     @Override
-    public boolean mover(int novoX, int novoY) {
+    public boolean mover(int novoX, int novoY, Tabuleiro tabuleiro) {
         if (novoX == x || novoY == y || Math.abs(novoX - x) == Math.abs(novoY - y)) {
-            System.out.println("Movimento válido para a Rainha.");
-            x = novoX;
-            y = novoY;
-            return true;
+            // Verifica se o caminho está livre
+            int passoX = (novoX > x) ? 1 : (novoX < x) ? -1 : 0;
+            int passoY = (novoY > y) ? 1 : (novoY < y) ? -1 : 0;
+
+            for (int i = x + passoX, j = y + passoY; i != novoX || j != novoY; i += passoX, j += passoY) {
+                if (tabuleiro.tabuleiro[i][j] != null) {
+                    System.out.println("Movimento inválido para a Rainha, caminho obstruído.");
+                    return false;
+                }
+            }
+
+            if (tabuleiro.isPosicaoValida(novoX, novoY)) {
+                System.out.println("Movimento válido para a Rainha.");
+                x = novoX;
+                y = novoY;
+                return true;
+            }
         }
         System.out.println("Movimento inválido para a Rainha.");
         return false;
@@ -54,12 +69,24 @@ class Bispo extends Peca {
     }
 
     @Override
-    public boolean mover(int novoX, int novoY) {
+    public boolean mover(int novoX, int novoY, Tabuleiro tabuleiro) {
         if (Math.abs(novoX - x) == Math.abs(novoY - y)) {
-            System.out.println("Movimento válido para o Bispo.");
-            x = novoX;
-            y = novoY;
-            return true;
+            int passoX = (novoX > x) ? 1 : (novoX < x) ? -1 : 0;
+            int passoY = (novoY > y) ? 1 : (novoY < y) ? -1 : 0;
+
+            for (int i = x + passoX, j = y + passoY; i != novoX || j != novoY; i += passoX, j += passoY) {
+                if (tabuleiro.tabuleiro[i][j] != null) {
+                    System.out.println("Movimento inválido para o Bispo, caminho obstruído.");
+                    return false;
+                }
+            }
+
+            if (tabuleiro.isPosicaoValida(novoX, novoY)) {
+                System.out.println("Movimento válido para o Bispo.");
+                x = novoX;
+                y = novoY;
+                return true;
+            }
         }
         System.out.println("Movimento inválido para o Bispo.");
         return false;
@@ -72,13 +99,15 @@ class Cavalo extends Peca {
     }
 
     @Override
-    public boolean mover(int novoX, int novoY) {
+    public boolean mover(int novoX, int novoY, Tabuleiro tabuleiro) {
         if ((Math.abs(novoX - x) == 2 && Math.abs(novoY - y) == 1) ||
             (Math.abs(novoX - x) == 1 && Math.abs(novoY - y) == 2)) {
-            System.out.println("Movimento válido para o Cavalo.");
-            x = novoX;
-            y = novoY;
-            return true;
+            if (tabuleiro.isPosicaoValida(novoX, novoY)) {
+                System.out.println("Movimento válido para o Cavalo.");
+                x = novoX;
+                y = novoY;
+                return true;
+            }
         }
         System.out.println("Movimento inválido para o Cavalo.");
         return false;
@@ -91,12 +120,24 @@ class Torre extends Peca {
     }
 
     @Override
-    public boolean mover(int novoX, int novoY) {
+    public boolean mover(int novoX, int novoY, Tabuleiro tabuleiro) {
         if (novoX == x || novoY == y) {
-            System.out.println("Movimento válido para a Torre.");
-            x = novoX;
-            y = novoY;
-            return true;
+            int passoX = (novoX > x) ? 1 : (novoX < x) ? -1 : 0;
+            int passoY = (novoY > y) ? 1 : (novoY < y) ? -1 : 0;
+
+            for (int i = x + passoX, j = y + passoY; i != novoX || j != novoY; i += passoX, j += passoY) {
+                if (tabuleiro.tabuleiro[i][j] != null) {
+                    System.out.println("Movimento inválido para a Torre, caminho obstruído.");
+                    return false;
+                }
+            }
+
+            if (tabuleiro.isPosicaoValida(novoX, novoY)) {
+                System.out.println("Movimento válido para a Torre.");
+                x = novoX;
+                y = novoY;
+                return true;
+            }
         }
         System.out.println("Movimento inválido para a Torre.");
         return false;
@@ -109,10 +150,24 @@ class Peao extends Peca {
     }
 
     @Override
-    public boolean mover(int novoX, int novoY) {
-        //Considerando que os peões só se movem para frente e capturam na diagonal
-        if ((novoX == x && novoY == y + 1) || // Movimento simples
-            (Math.abs(novoX - x) == 1 && novoY == y + 1)) { // Captura
+    public boolean mover(int novoX, int novoY, Tabuleiro tabuleiro) {
+        int direcao = (y == 1) ? 1 : -1; // Considerando que peões movem-se para cima ou para baixo
+        boolean movimentoValido = false;
+
+        // Movimento inicial (dois quadrados para frente)
+        if (novoX == x && novoY == y + 2 * direcao && (y == 1 || y == 6) && tabuleiro.tabuleiro[x][y + direcao] == null) {
+            movimentoValido = true;
+        }
+        // Movimento simples (um quadrado para frente)
+        else if (novoX == x && novoY == y + direcao && tabuleiro.tabuleiro[novoX][novoY] == null) {
+            movimentoValido = true;
+        }
+        // Captura diagonal
+        else if (Math.abs(novoX - x) == 1 && novoY == y + direcao && tabuleiro.tabuleiro[novoX][novoY] != null) {
+            movimentoValido = true;
+        }
+
+        if (movimentoValido) {
             System.out.println("Movimento válido para o Peão.");
             x = novoX;
             y = novoY;
@@ -124,7 +179,7 @@ class Peao extends Peca {
 }
 
 class Tabuleiro {
-    private Peca[][] tabuleiro;
+    public Peca[][] tabuleiro;
 
     public Tabuleiro() {
         tabuleiro = new Peca[8][8];
@@ -136,12 +191,19 @@ class Tabuleiro {
 
     public boolean moverPeca(int x, int y, int novoX, int novoY) {
         Peca peca = tabuleiro[x][y];
-        if (peca != null && peca.mover(novoX, novoY)) {
+        if (peca != null && peca.mover(novoX, novoY, this)) {
+            if (tabuleiro[novoX][novoY] != null) {
+                System.out.println("Peça capturada.");
+            }
             tabuleiro[novoX][novoY] = peca;
             tabuleiro[x][y] = null;
             return true;
         }
         return false;
+    }
+
+    public boolean isPosicaoValida(int x, int y) {
+        return x >= 0 && x < 8 && y >= 0 && y < 8;
     }
 }
 
@@ -183,7 +245,12 @@ public class Main {
         Jogador jogador1 = new Jogador("Jogador 1");
         Jogador jogador2 = new Jogador("Jogador 2");
 
+        // Teste de movimentos
         System.out.println(jogador1.fazerMovimento(tabuleiro, 0, 0, 1, 1)); // Movimento inválido para o Rei
         System.out.println(jogador1.fazerMovimento(tabuleiro, 1, 1, 3, 3)); // Movimento válido para a Rainha
+        System.out.println(jogador1.fazerMovimento(tabuleiro, 5, 5, 5, 6)); // Movimento válido para o Peão
+        System.out.println(jogador1.fazerMovimento(tabuleiro, 5, 6, 4, 7)); // Movimento válido para o Peão (captura diagonal)
+        System.out.println(jogador2.fazerMovimento(tabuleiro, 3, 3, 5, 5)); // Movimento inválido para o Cavalo
+        System.out.println(jogador2.fazerMovimento(tabuleiro, 4, 4, 4, 7)); // Movimento inválido para a Torre (movimento longo sem checar obstruções)
     }
 }
